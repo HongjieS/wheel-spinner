@@ -43,6 +43,7 @@ limitations under the License.
       this.myWheel.configure(this.wheelConfig, this.darkMode);
       this.myWheel.setEntries(this.wheelConfig.entries, this.wheelConfig.maxNames,
                                 this.wheelConfig.allowDuplicates);
+      window.wheelInstance = this.myWheel;
       this.tick(0);
       this.startKeyListener();
     },
@@ -134,6 +135,9 @@ limitations under the License.
       },
       refresh() {
         this.myWheel.refresh();
+      },
+      getWheel() {
+        return this.myWheel;
       },
     }
   }

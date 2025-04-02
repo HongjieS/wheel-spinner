@@ -28,6 +28,7 @@ export default class Wheel {
     this.entryPicker = new DisplayEntryPicker();
     this.doneSpinningCallback = () => {};
     this.nameChangedCallback = () => {};
+    this.targetEntry = null;
   }
 
   setEntries(entries, maxSlices, allowDuplicates) {
@@ -60,6 +61,10 @@ export default class Wheel {
   click(nameChangedCallback, doneSpinningCallback) {
     this.nameChangedCallback = nameChangedCallback;
     this.doneSpinningCallback = doneSpinningCallback;
+    // If we have a target, set the random position before starting the spin
+    if (this.targetEntry) {
+      this.setRandomPosition();
+    }
     this.state.click(this);
   }
 
@@ -71,7 +76,37 @@ export default class Wheel {
     return this.state.isSpinning();
   }
 
+  setTargetEntry(entry) {
+    this.targetEntry = entry;
+  }
+
+  setTargetIndex(index) {
+    const entries = this.entryPicker.getDisplayEntries();
+    if (index >= 0 && index < entries.length) {
+      this.targetEntry = entries[index];
+    }
+  }
+
+  clearTarget() {
+    this.targetEntry = null;
+  }
+
   setRandomPosition() {
+    if (this.targetEntry) {
+      // Calculate the angle needed to land on the target entry
+      const entries = this.entryPicker.getDisplayEntries();
+      const targetIndex = entries.findIndex(e => e === this.targetEntry);
+      if (targetIndex !== -1) {
+        const radiansPerSegment = 2 * Math.PI / entries.length;
+        // Set angle to point to the middle of the target segment
+        this.angle = (targetIndex + 0.5) * radiansPerSegment;
+        // Add some random variation to make it look natural
+        this.angle += (Math.random() - 0.5) * radiansPerSegment * 0.1;
+        this.entryPicker.setRandomPosition();
+        return;
+      }
+    }
+    // Default random behavior if no target or target not found
     this.angle = Math.random() * 2 * Math.PI;
     this.entryPicker.setRandomPosition();
   }
