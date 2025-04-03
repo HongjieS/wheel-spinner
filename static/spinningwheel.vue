@@ -39,11 +39,24 @@ limitations under the License.
       }
     },
     mounted() {
+      // Create entries with numbers 1-100
+      const entries = Array.from({length: 100}, (_, i) => ({text: (i + 1).toString()}));
+      this.wheelConfig.entries = entries;
+      
       this.myWheel = new Wheel();
       this.myWheel.configure(this.wheelConfig, this.darkMode);
       this.myWheel.setEntries(this.wheelConfig.entries, this.wheelConfig.maxNames,
                                 this.wheelConfig.allowDuplicates);
       window.wheelInstance = this.myWheel;
+
+      // Generate random sequence
+      const sequence = this.generateRandomSequence();
+      this.myWheel.setPredeterminedSequence(sequence);
+      
+      // Log the sequence
+      console.log('Random sequence:', sequence);
+      console.log('First 10 spins will land on numbers:', sequence.slice(0, 10).map(i => i + 1));
+
       this.tick(0);
       this.startKeyListener();
     },
@@ -138,6 +151,16 @@ limitations under the License.
       },
       getWheel() {
         return this.myWheel;
+      },
+      generateRandomSequence() {
+        // Generate a sequence of indices 0-99 in random order
+        const sequence = Array.from({length: 100}, (_, i) => i);
+        // Fisher-Yates shuffle
+        for (let i = sequence.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
+        }
+        return sequence;
       },
     }
   }

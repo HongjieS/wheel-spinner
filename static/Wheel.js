@@ -29,6 +29,8 @@ export default class Wheel {
     this.doneSpinningCallback = () => {};
     this.nameChangedCallback = () => {};
     this.targetEntry = null;
+    this.predeterminedSequence = [];
+    this.currentSequenceIndex = 0;
   }
 
   setEntries(entries, maxSlices, allowDuplicates) {
@@ -61,6 +63,14 @@ export default class Wheel {
   click(nameChangedCallback, doneSpinningCallback) {
     this.nameChangedCallback = nameChangedCallback;
     this.doneSpinningCallback = doneSpinningCallback;
+    
+    // If we have a predetermined sequence, use it
+    if (this.predeterminedSequence.length > 0 && this.currentSequenceIndex < this.predeterminedSequence.length) {
+      const targetIndex = this.predeterminedSequence[this.currentSequenceIndex];
+      this.setTargetIndex(targetIndex);
+      this.currentSequenceIndex++;
+    }
+    
     // If we have a target, set the random position before starting the spin
     if (this.targetEntry) {
       this.setRandomPosition();
@@ -153,6 +163,11 @@ export default class Wheel {
         this.entryPicker.getAllEntries(), this.wheelConfig, this.darkMode
       );
     }
+  }
+
+  setPredeterminedSequence(sequence) {
+    this.predeterminedSequence = sequence;
+    this.currentSequenceIndex = 0;
   }
 
 }
